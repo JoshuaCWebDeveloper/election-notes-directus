@@ -12,7 +12,7 @@ yours.
 
 Only officially supported OS is `Ubuntu 20.04`.
 
-Recent version ofDocker must be installed.
+Recent version of Docker must be installed.
 
 ## Run
 
