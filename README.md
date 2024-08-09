@@ -1,4 +1,4 @@
-# DbUi
+# Election Notes - Directus
 
 A prototype app that runs a PostgreSQL db and a Directus instance with some
 custom extensions.
