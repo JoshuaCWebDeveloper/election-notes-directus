@@ -42,9 +42,11 @@ Candidates, Issues, and Stances.
 Once you've added some content, navigate to the Insights pane on the left side
 navbar to view the visualizations.
 
-## Development - Install
+## Development
 
-### Git
+### Install
+
+#### Git
 
 Include this project's custom git config:
 
@@ -52,7 +54,7 @@ Include this project's custom git config:
 git config --local include.path "${PWD}/.gitconfig"
 ```
 
-### nvm
+#### nvm
 
 Run:
 
@@ -60,7 +62,7 @@ Run:
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
 ```
 
-### Autoenv
+#### Autoenv
 
 Installing autoenv eliminates the need to run `nvm use` every time you `cd` into the project.
 
@@ -80,7 +82,7 @@ AUTOENV_ENV_FILENAME=.autoenv
 AUTOENV_ENV_LEAVE_FILENAME=.autoenv.leave
 ```
 
-### Project
+#### Project
 
 Once all above dependencies are installed, run:
 
@@ -89,6 +91,22 @@ nvm use
 
 npm install
 ```
+
+### Error mounting volume
+
+If you encounter the following error:
+
+```
+Error response from daemon: error while mounting volume [...]  no such file or directory
+```
+
+delete the volumes by running
+
+```bash
+docker compose down -v
+```
+
+and then try again.
 
 ## About Nx
 
