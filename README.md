@@ -92,6 +92,12 @@ nvm use
 npm install
 ```
 
+### Working with `packages/data`
+
+If you wish to modify or backup `packages/data` somehow, you may encounter permission issues.
+
+Run `git prep-data` to reset permissions and prepare the directory for git versioning.
+
 ### Error mounting volume
 
 If you encounter the following error:
