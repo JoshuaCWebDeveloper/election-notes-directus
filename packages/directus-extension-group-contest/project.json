@@ -1,0 +1,17 @@
+{
+  "name": "directus-extension-group-contest",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/directus-extension-group-contest/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "command": "bash packages/directus-extension-group-contest/build.sh",
+      "configurations": {
+        "production": {
+          "command": "bash packages/directus-extension-group-contest/build.sh production"
+        }
+      }
+    }
+  }
+}

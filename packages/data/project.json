@@ -1,0 +1,15 @@
+{
+  "name": "data",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/data/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "prep-data": {
+      "command": "bash packages/data/prep-data.sh"
+    },
+    "reset-data": {
+      "command": "bash packages/data/reset-data.sh"
+    }
+  }
+}

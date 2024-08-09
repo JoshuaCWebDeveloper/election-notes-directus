@@ -1,0 +1,4 @@
+[alias]
+	diff-silent = !git diff 2>/dev/null
+	prep-data = !npm run nx -- run data:prep-data
+	status-silent = !git status 2>/dev/null

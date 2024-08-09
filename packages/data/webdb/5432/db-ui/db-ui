@@ -1,0 +1,2172 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 12.19 (Debian 12.19-1.pgdg120+1)
+-- Dumped by pg_dump version 16.3
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: db-ui-user
+--
+
+-- *not* creating schema, since initdb creates it
+
+
+ALTER SCHEMA public OWNER TO "db-ui-user";
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: candidate; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.candidate (
+    id integer NOT NULL,
+    "firstName" character varying(255),
+    "middleName" character varying(255),
+    "lastName" character varying(255),
+    score real,
+    confidence real,
+    "stancesCount" integer,
+    "confidenceScoreProduct" integer
+);
+
+
+ALTER TABLE public.candidate OWNER TO "db-ui-user";
+
+--
+-- Name: candidates_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.candidates_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.candidates_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: candidates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.candidates_id_seq OWNED BY public.candidate.id;
+
+
+--
+-- Name: directus_activity; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_activity (
+    id integer NOT NULL,
+    action character varying(45) NOT NULL,
+    "user" uuid,
+    "timestamp" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    ip character varying(50),
+    user_agent text,
+    collection character varying(64) NOT NULL,
+    item character varying(255) NOT NULL,
+    comment text,
+    origin character varying(255)
+);
+
+
+ALTER TABLE public.directus_activity OWNER TO "db-ui-user";
+
+--
+-- Name: directus_activity_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.directus_activity_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.directus_activity_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: directus_activity_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.directus_activity_id_seq OWNED BY public.directus_activity.id;
+
+
+--
+-- Name: directus_collections; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_collections (
+    collection character varying(64) NOT NULL,
+    icon character varying(30),
+    note text,
+    display_template character varying(255),
+    hidden boolean DEFAULT false NOT NULL,
+    singleton boolean DEFAULT false NOT NULL,
+    translations json,
+    archive_field character varying(64),
+    archive_app_filter boolean DEFAULT true NOT NULL,
+    archive_value character varying(255),
+    unarchive_value character varying(255),
+    sort_field character varying(64),
+    accountability character varying(255) DEFAULT 'all'::character varying,
+    color character varying(255),
+    item_duplication_fields json,
+    sort integer,
+    "group" character varying(64),
+    collapse character varying(255) DEFAULT 'open'::character varying NOT NULL,
+    preview_url character varying(255),
+    versioning boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.directus_collections OWNER TO "db-ui-user";
+
+--
+-- Name: directus_dashboards; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_dashboards (
+    id uuid NOT NULL,
+    name character varying(255) NOT NULL,
+    icon character varying(30) DEFAULT 'dashboard'::character varying NOT NULL,
+    note text,
+    date_created timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    user_created uuid,
+    color character varying(255)
+);
+
+
+ALTER TABLE public.directus_dashboards OWNER TO "db-ui-user";
+
+--
+-- Name: directus_extensions; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_extensions (
+    enabled boolean DEFAULT true NOT NULL,
+    id uuid NOT NULL,
+    folder character varying(255) NOT NULL,
+    source character varying(255) NOT NULL,
+    bundle uuid
+);
+
+
+ALTER TABLE public.directus_extensions OWNER TO "db-ui-user";
+
+--
+-- Name: directus_fields; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_fields (
+    id integer NOT NULL,
+    collection character varying(64) NOT NULL,
+    field character varying(64) NOT NULL,
+    special character varying(64),
+    interface character varying(64),
+    options json,
+    display character varying(64),
+    display_options json,
+    readonly boolean DEFAULT false NOT NULL,
+    hidden boolean DEFAULT false NOT NULL,
+    sort integer,
+    width character varying(30) DEFAULT 'full'::character varying,
+    translations json,
+    note text,
+    conditions json,
+    required boolean DEFAULT false,
+    "group" character varying(64),
+    validation json,
+    validation_message text
+);
+
+
+ALTER TABLE public.directus_fields OWNER TO "db-ui-user";
+
+--
+-- Name: directus_fields_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.directus_fields_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.directus_fields_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: directus_fields_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.directus_fields_id_seq OWNED BY public.directus_fields.id;
+
+
+--
+-- Name: directus_files; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_files (
+    id uuid NOT NULL,
+    storage character varying(255) NOT NULL,
+    filename_disk character varying(255),
+    filename_download character varying(255) NOT NULL,
+    title character varying(255),
+    type character varying(255),
+    folder uuid,
+    uploaded_by uuid,
+    uploaded_on timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    modified_by uuid,
+    modified_on timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    charset character varying(50),
+    filesize bigint,
+    width integer,
+    height integer,
+    duration integer,
+    embed character varying(200),
+    description text,
+    location text,
+    tags text,
+    metadata json,
+    focal_point_x integer,
+    focal_point_y integer,
+    tus_id character varying(64),
+    tus_data json
+);
+
+
+ALTER TABLE public.directus_files OWNER TO "db-ui-user";
+
+--
+-- Name: directus_flows; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_flows (
+    id uuid NOT NULL,
+    name character varying(255) NOT NULL,
+    icon character varying(30),
+    color character varying(255),
+    description text,
+    status character varying(255) DEFAULT 'active'::character varying NOT NULL,
+    trigger character varying(255),
+    accountability character varying(255) DEFAULT 'all'::character varying,
+    options json,
+    operation uuid,
+    date_created timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    user_created uuid
+);
+
+
+ALTER TABLE public.directus_flows OWNER TO "db-ui-user";
+
+--
+-- Name: directus_folders; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_folders (
+    id uuid NOT NULL,
+    name character varying(255) NOT NULL,
+    parent uuid
+);
+
+
+ALTER TABLE public.directus_folders OWNER TO "db-ui-user";
+
+--
+-- Name: directus_migrations; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_migrations (
+    version character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    "timestamp" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.directus_migrations OWNER TO "db-ui-user";
+
+--
+-- Name: directus_notifications; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_notifications (
+    id integer NOT NULL,
+    "timestamp" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    status character varying(255) DEFAULT 'inbox'::character varying,
+    recipient uuid NOT NULL,
+    sender uuid,
+    subject character varying(255) NOT NULL,
+    message text,
+    collection character varying(64),
+    item character varying(255)
+);
+
+
+ALTER TABLE public.directus_notifications OWNER TO "db-ui-user";
+
+--
+-- Name: directus_notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.directus_notifications_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.directus_notifications_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: directus_notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.directus_notifications_id_seq OWNED BY public.directus_notifications.id;
+
+
+--
+-- Name: directus_operations; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_operations (
+    id uuid NOT NULL,
+    name character varying(255),
+    key character varying(255) NOT NULL,
+    type character varying(255) NOT NULL,
+    position_x integer NOT NULL,
+    position_y integer NOT NULL,
+    options json,
+    resolve uuid,
+    reject uuid,
+    flow uuid NOT NULL,
+    date_created timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    user_created uuid
+);
+
+
+ALTER TABLE public.directus_operations OWNER TO "db-ui-user";
+
+--
+-- Name: directus_panels; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_panels (
+    id uuid NOT NULL,
+    dashboard uuid NOT NULL,
+    name character varying(255),
+    icon character varying(30) DEFAULT NULL::character varying,
+    color character varying(10),
+    show_header boolean DEFAULT false NOT NULL,
+    note text,
+    type character varying(255) NOT NULL,
+    position_x integer NOT NULL,
+    position_y integer NOT NULL,
+    width integer NOT NULL,
+    height integer NOT NULL,
+    options json,
+    date_created timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    user_created uuid
+);
+
+
+ALTER TABLE public.directus_panels OWNER TO "db-ui-user";
+
+--
+-- Name: directus_permissions; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_permissions (
+    id integer NOT NULL,
+    role uuid,
+    collection character varying(64) NOT NULL,
+    action character varying(10) NOT NULL,
+    permissions json,
+    validation json,
+    presets json,
+    fields text
+);
+
+
+ALTER TABLE public.directus_permissions OWNER TO "db-ui-user";
+
+--
+-- Name: directus_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.directus_permissions_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.directus_permissions_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: directus_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.directus_permissions_id_seq OWNED BY public.directus_permissions.id;
+
+
+--
+-- Name: directus_presets; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_presets (
+    id integer NOT NULL,
+    bookmark character varying(255),
+    "user" uuid,
+    role uuid,
+    collection character varying(64),
+    search character varying(100),
+    layout character varying(100) DEFAULT 'tabular'::character varying,
+    layout_query json,
+    layout_options json,
+    refresh_interval integer,
+    filter json,
+    icon character varying(30) DEFAULT 'bookmark'::character varying,
+    color character varying(255)
+);
+
+
+ALTER TABLE public.directus_presets OWNER TO "db-ui-user";
+
+--
+-- Name: directus_presets_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.directus_presets_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.directus_presets_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: directus_presets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.directus_presets_id_seq OWNED BY public.directus_presets.id;
+
+
+--
+-- Name: directus_relations; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_relations (
+    id integer NOT NULL,
+    many_collection character varying(64) NOT NULL,
+    many_field character varying(64) NOT NULL,
+    one_collection character varying(64),
+    one_field character varying(64),
+    one_collection_field character varying(64),
+    one_allowed_collections text,
+    junction_field character varying(64),
+    sort_field character varying(64),
+    one_deselect_action character varying(255) DEFAULT 'nullify'::character varying NOT NULL
+);
+
+
+ALTER TABLE public.directus_relations OWNER TO "db-ui-user";
+
+--
+-- Name: directus_relations_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.directus_relations_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.directus_relations_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: directus_relations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.directus_relations_id_seq OWNED BY public.directus_relations.id;
+
+
+--
+-- Name: directus_revisions; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_revisions (
+    id integer NOT NULL,
+    activity integer NOT NULL,
+    collection character varying(64) NOT NULL,
+    item character varying(255) NOT NULL,
+    data json,
+    delta json,
+    parent integer,
+    version uuid
+);
+
+
+ALTER TABLE public.directus_revisions OWNER TO "db-ui-user";
+
+--
+-- Name: directus_revisions_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.directus_revisions_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.directus_revisions_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: directus_revisions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.directus_revisions_id_seq OWNED BY public.directus_revisions.id;
+
+
+--
+-- Name: directus_roles; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_roles (
+    id uuid NOT NULL,
+    name character varying(100) NOT NULL,
+    icon character varying(30) DEFAULT 'supervised_user_circle'::character varying NOT NULL,
+    description text,
+    ip_access text,
+    enforce_tfa boolean DEFAULT false NOT NULL,
+    admin_access boolean DEFAULT false NOT NULL,
+    app_access boolean DEFAULT true NOT NULL
+);
+
+
+ALTER TABLE public.directus_roles OWNER TO "db-ui-user";
+
+--
+-- Name: directus_sessions; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_sessions (
+    token character varying(64) NOT NULL,
+    "user" uuid,
+    expires timestamp with time zone NOT NULL,
+    ip character varying(255),
+    user_agent text,
+    share uuid,
+    origin character varying(255),
+    next_token character varying(64)
+);
+
+
+ALTER TABLE public.directus_sessions OWNER TO "db-ui-user";
+
+--
+-- Name: directus_settings; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_settings (
+    id integer NOT NULL,
+    project_name character varying(100) DEFAULT 'Directus'::character varying NOT NULL,
+    project_url character varying(255),
+    project_color character varying(255) DEFAULT '#6644FF'::character varying NOT NULL,
+    project_logo uuid,
+    public_foreground uuid,
+    public_background uuid,
+    public_note text,
+    auth_login_attempts integer DEFAULT 25,
+    auth_password_policy character varying(100),
+    storage_asset_transform character varying(7) DEFAULT 'all'::character varying,
+    storage_asset_presets json,
+    custom_css text,
+    storage_default_folder uuid,
+    basemaps json,
+    mapbox_key character varying(255),
+    module_bar json,
+    project_descriptor character varying(100),
+    default_language character varying(255) DEFAULT 'en-US'::character varying NOT NULL,
+    custom_aspect_ratios json,
+    public_favicon uuid,
+    default_appearance character varying(255) DEFAULT 'auto'::character varying NOT NULL,
+    default_theme_light character varying(255),
+    theme_light_overrides json,
+    default_theme_dark character varying(255),
+    theme_dark_overrides json,
+    report_error_url character varying(255),
+    report_bug_url character varying(255),
+    report_feature_url character varying(255),
+    public_registration boolean DEFAULT false NOT NULL,
+    public_registration_verify_email boolean DEFAULT true NOT NULL,
+    public_registration_role uuid,
+    public_registration_email_filter json
+);
+
+
+ALTER TABLE public.directus_settings OWNER TO "db-ui-user";
+
+--
+-- Name: directus_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.directus_settings_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.directus_settings_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: directus_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.directus_settings_id_seq OWNED BY public.directus_settings.id;
+
+
+--
+-- Name: directus_shares; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_shares (
+    id uuid NOT NULL,
+    name character varying(255),
+    collection character varying(64) NOT NULL,
+    item character varying(255) NOT NULL,
+    role uuid,
+    password character varying(255),
+    user_created uuid,
+    date_created timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    date_start timestamp with time zone,
+    date_end timestamp with time zone,
+    times_used integer DEFAULT 0,
+    max_uses integer
+);
+
+
+ALTER TABLE public.directus_shares OWNER TO "db-ui-user";
+
+--
+-- Name: directus_translations; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_translations (
+    id uuid NOT NULL,
+    language character varying(255) NOT NULL,
+    key character varying(255) NOT NULL,
+    value text NOT NULL
+);
+
+
+ALTER TABLE public.directus_translations OWNER TO "db-ui-user";
+
+--
+-- Name: directus_users; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_users (
+    id uuid NOT NULL,
+    first_name character varying(50),
+    last_name character varying(50),
+    email character varying(128),
+    password character varying(255),
+    location character varying(255),
+    title character varying(50),
+    description text,
+    tags json,
+    avatar uuid,
+    language character varying(255) DEFAULT NULL::character varying,
+    tfa_secret character varying(255),
+    status character varying(16) DEFAULT 'active'::character varying NOT NULL,
+    role uuid,
+    token character varying(255),
+    last_access timestamp with time zone,
+    last_page character varying(255),
+    provider character varying(128) DEFAULT 'default'::character varying NOT NULL,
+    external_identifier character varying(255),
+    auth_data json,
+    email_notifications boolean DEFAULT true,
+    appearance character varying(255),
+    theme_dark character varying(255),
+    theme_light character varying(255),
+    theme_light_overrides json,
+    theme_dark_overrides json
+);
+
+
+ALTER TABLE public.directus_users OWNER TO "db-ui-user";
+
+--
+-- Name: directus_versions; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_versions (
+    id uuid NOT NULL,
+    key character varying(64) NOT NULL,
+    name character varying(255),
+    collection character varying(64) NOT NULL,
+    item character varying(255) NOT NULL,
+    hash character varying(255),
+    date_created timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    date_updated timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    user_created uuid,
+    user_updated uuid
+);
+
+
+ALTER TABLE public.directus_versions OWNER TO "db-ui-user";
+
+--
+-- Name: directus_webhooks; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.directus_webhooks (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    method character varying(10) DEFAULT 'POST'::character varying NOT NULL,
+    url character varying(255) NOT NULL,
+    status character varying(10) DEFAULT 'active'::character varying NOT NULL,
+    data boolean DEFAULT true NOT NULL,
+    actions character varying(100) NOT NULL,
+    collections character varying(255) NOT NULL,
+    headers json,
+    was_active_before_deprecation boolean DEFAULT false NOT NULL,
+    migrated_flow uuid
+);
+
+
+ALTER TABLE public.directus_webhooks OWNER TO "db-ui-user";
+
+--
+-- Name: directus_webhooks_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.directus_webhooks_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.directus_webhooks_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: directus_webhooks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.directus_webhooks_id_seq OWNED BY public.directus_webhooks.id;
+
+
+--
+-- Name: fact; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.fact (
+    id integer NOT NULL,
+    date_created timestamp with time zone,
+    date_updated timestamp with time zone,
+    "Summary" character varying(255),
+    description text
+);
+
+
+ALTER TABLE public.fact OWNER TO "db-ui-user";
+
+--
+-- Name: fact_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.fact_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.fact_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: fact_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.fact_id_seq OWNED BY public.fact.id;
+
+
+--
+-- Name: issue; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.issue (
+    id integer NOT NULL,
+    name character varying(255),
+    description character varying(255),
+    points integer,
+    confidence real,
+    "stancesCount" integer
+);
+
+
+ALTER TABLE public.issue OWNER TO "db-ui-user";
+
+--
+-- Name: issues_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.issues_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.issues_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: issues_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.issues_id_seq OWNED BY public.issue.id;
+
+
+--
+-- Name: stance; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.stance (
+    id integer NOT NULL,
+    date_created timestamp with time zone,
+    date_updated timestamp with time zone,
+    title character varying(255),
+    candidate integer,
+    issue integer,
+    rating integer,
+    points real,
+    confidence integer,
+    label character varying(255),
+    description text
+);
+
+
+ALTER TABLE public.stance OWNER TO "db-ui-user";
+
+--
+-- Name: stance_fact; Type: TABLE; Schema: public; Owner: db-ui-user
+--
+
+CREATE TABLE public.stance_fact (
+    id integer NOT NULL,
+    stance integer,
+    fact integer
+);
+
+
+ALTER TABLE public.stance_fact OWNER TO "db-ui-user";
+
+--
+-- Name: stance_fact_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.stance_fact_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.stance_fact_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: stance_fact_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.stance_fact_id_seq OWNED BY public.stance_fact.id;
+
+
+--
+-- Name: stance_id_seq; Type: SEQUENCE; Schema: public; Owner: db-ui-user
+--
+
+CREATE SEQUENCE public.stance_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.stance_id_seq OWNER TO "db-ui-user";
+
+--
+-- Name: stance_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: db-ui-user
+--
+
+ALTER SEQUENCE public.stance_id_seq OWNED BY public.stance.id;
+
+
+--
+-- Name: candidate id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.candidate ALTER COLUMN id SET DEFAULT nextval('public.candidates_id_seq'::regclass);
+
+
+--
+-- Name: directus_activity id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_activity ALTER COLUMN id SET DEFAULT nextval('public.directus_activity_id_seq'::regclass);
+
+
+--
+-- Name: directus_fields id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_fields ALTER COLUMN id SET DEFAULT nextval('public.directus_fields_id_seq'::regclass);
+
+
+--
+-- Name: directus_notifications id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_notifications ALTER COLUMN id SET DEFAULT nextval('public.directus_notifications_id_seq'::regclass);
+
+
+--
+-- Name: directus_permissions id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_permissions ALTER COLUMN id SET DEFAULT nextval('public.directus_permissions_id_seq'::regclass);
+
+
+--
+-- Name: directus_presets id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_presets ALTER COLUMN id SET DEFAULT nextval('public.directus_presets_id_seq'::regclass);
+
+
+--
+-- Name: directus_relations id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_relations ALTER COLUMN id SET DEFAULT nextval('public.directus_relations_id_seq'::regclass);
+
+
+--
+-- Name: directus_revisions id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_revisions ALTER COLUMN id SET DEFAULT nextval('public.directus_revisions_id_seq'::regclass);
+
+
+--
+-- Name: directus_settings id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_settings ALTER COLUMN id SET DEFAULT nextval('public.directus_settings_id_seq'::regclass);
+
+
+--
+-- Name: directus_webhooks id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_webhooks ALTER COLUMN id SET DEFAULT nextval('public.directus_webhooks_id_seq'::regclass);
+
+
+--
+-- Name: fact id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.fact ALTER COLUMN id SET DEFAULT nextval('public.fact_id_seq'::regclass);
+
+
+--
+-- Name: issue id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.issue ALTER COLUMN id SET DEFAULT nextval('public.issues_id_seq'::regclass);
+
+
+--
+-- Name: stance id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.stance ALTER COLUMN id SET DEFAULT nextval('public.stance_id_seq'::regclass);
+
+
+--
+-- Name: stance_fact id; Type: DEFAULT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.stance_fact ALTER COLUMN id SET DEFAULT nextval('public.stance_fact_id_seq'::regclass);
+
+
+--
+-- Data for Name: candidate; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.candidate (id, "firstName", "middleName", "lastName", score, confidence, "stancesCount", "confidenceScoreProduct") FROM stdin;
+\.
+
+
+--
+-- Data for Name: directus_activity; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_activity (id, action, "user", "timestamp", ip, user_agent, collection, item, comment, origin) FROM stdin;
+723	login	4dfb59ee-9995-4690-9710-beb7d3acc189	2024-08-09 17:00:22.005+00	172.24.0.1	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 Edg/127.0.0.0	directus_users	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	http://localhost:8055
+\.
+
+
+--
+-- Data for Name: directus_collections; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_collections (collection, icon, note, display_template, hidden, singleton, translations, archive_field, archive_app_filter, archive_value, unarchive_value, sort_field, accountability, color, item_duplication_fields, sort, "group", collapse, preview_url, versioning) FROM stdin;
+election2024	folder	\N	\N	f	f	\N	\N	t	\N	\N	\N	all	#CC0000	\N	1	\N	open	\N	f
+first	\N	\N	\N	f	f	\N	status	t	archived	draft	sort	all	\N	\N	2	\N	open	\N	f
+candidate	\N	\N	\N	f	f	\N	\N	t	\N	\N	\N	all	\N	\N	1	election2024	open	\N	f
+stance	\N	\N	\N	f	f	\N	\N	t	\N	\N	\N	all	\N	\N	3	election2024	open	\N	f
+fact	\N	\N	\N	f	f	\N	\N	t	\N	\N	\N	all	\N	\N	4	election2024	open	\N	f
+stance_fact	import_export	\N	\N	t	f	\N	\N	t	\N	\N	\N	all	\N	\N	\N	\N	open	\N	f
+issue	\N	\N	\N	f	f	\N	\N	t	\N	\N	\N	all	\N	\N	2	election2024	open	\N	f
+\.
+
+
+--
+-- Data for Name: directus_dashboards; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_dashboards (id, name, icon, note, date_created, user_created, color) FROM stdin;
+e7fc9a1f-0c5c-40cb-8a0d-7ab9e55faa9d	Candidates	bar_chart_4_bars	\N	2024-08-03 02:15:58.454+00	4dfb59ee-9995-4690-9710-beb7d3acc189	#E35169
+9ccac6c8-bb2a-477c-a2b9-233ecb9f0925	Candidate Contest	space_dashboard	\N	2024-08-03 00:16:49.048+00	4dfb59ee-9995-4690-9710-beb7d3acc189	\N
+ff2322a9-e257-4d27-80b6-e1d841f4f3fd	Stances	full_stacked_bar_chart	\N	2024-08-04 02:00:50.822+00	4dfb59ee-9995-4690-9710-beb7d3acc189	#3399FF
+\.
+
+
+--
+-- Data for Name: directus_extensions; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_extensions (enabled, id, folder, source, bundle) FROM stdin;
+t	c368c31f-809b-47c0-bcac-6a1f2e0be33f	cfd04b48-9b17-485b-818b-58d8c196d0c8	registry	\N
+t	ba006417-d6d5-4eed-a8a8-d51d89073a9c	9108c453-4ebf-4827-a42c-b90740888480	registry	\N
+t	a2c3a783-bc27-4755-ad20-721c7829e49a	directus-extension-group-contest	local	\N
+t	d8d38a20-c159-4335-9f28-3cdd3ea05ce6	directus-extension-candidate-contest	local	\N
+t	0dfbfce1-9941-4b35-9572-e60947928f96	e8124fff-1835-4133-8924-1ef0dbd328c5	registry	\N
+t	02879452-8042-445c-b161-fb617f319dcc	directus-extension-ordered-bar-chart	local	\N
+\.
+
+
+--
+-- Data for Name: directus_fields; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_fields (id, collection, field, special, interface, options, display, display_options, readonly, hidden, sort, width, translations, note, conditions, required, "group", validation, validation_message) FROM stdin;
+1	first	id	\N	input	\N	\N	\N	t	t	1	full	\N	\N	\N	f	\N	\N	\N
+2	first	status	\N	select-dropdown	{"choices":[{"text":"$t:published","value":"published","color":"var(--theme--primary)"},{"text":"$t:draft","value":"draft","color":"var(--theme--foreground)"},{"text":"$t:archived","value":"archived","color":"var(--theme--warning)"}]}	labels	{"showAsDot":true,"choices":[{"text":"$t:published","value":"published","color":"var(--theme--primary)","foreground":"var(--theme--primary)","background":"var(--theme--primary-background)"},{"text":"$t:draft","value":"draft","color":"var(--theme--foreground)","foreground":"var(--theme--foreground)","background":"var(--theme--background-normal)"},{"text":"$t:archived","value":"archived","color":"var(--theme--warning)","foreground":"var(--theme--warning)","background":"var(--theme--warning-background)"}]}	f	f	2	full	\N	\N	\N	f	\N	\N	\N
+3	first	sort	\N	input	\N	\N	\N	f	t	3	full	\N	\N	\N	f	\N	\N	\N
+4	first	user_created	user-created	select-dropdown-m2o	{"template":"{{avatar.$thumbnail}} {{first_name}} {{last_name}}"}	user	\N	t	t	4	half	\N	\N	\N	f	\N	\N	\N
+5	first	date_created	date-created	datetime	\N	datetime	{"relative":true}	t	t	5	half	\N	\N	\N	f	\N	\N	\N
+6	first	user_updated	user-updated	select-dropdown-m2o	{"template":"{{avatar.$thumbnail}} {{first_name}} {{last_name}}"}	user	\N	t	t	6	half	\N	\N	\N	f	\N	\N	\N
+7	first	date_updated	date-updated	datetime	\N	datetime	{"relative":true}	t	t	7	half	\N	\N	\N	f	\N	\N	\N
+8	first	name	\N	input	\N	\N	\N	f	f	8	full	\N	\N	\N	f	\N	\N	\N
+59	candidate	confidenceScoreProduct	\N	computed	{"template":"{{ MULTIPLY(confidence, score) }}"}	\N	\N	f	f	10	full	\N	\N	\N	f	\N	\N	\N
+41	candidate	score	\N	computed	{"template":"{{ ASUM(stances, points)  }}"}	\N	\N	f	f	7	full	\N	\N	\N	f	\N	\N	\N
+39	issue	stances	o2m	list-o2m	{"template":"{{id}} {{candidate.firstName}} {{candidate.middleName}} {{candidate.lastName}} {{title}} "}	\N	\N	f	f	\N	full	\N	\N	\N	f	\N	\N	\N
+15	candidate	firstName	\N	input	\N	\N	\N	f	f	3	full	\N	\N	\N	t	\N	\N	\N
+16	candidate	middleName	\N	input	\N	\N	\N	f	f	4	full	\N	\N	\N	f	\N	\N	\N
+17	candidate	lastName	\N	input	\N	\N	\N	f	f	5	full	\N	\N	\N	t	\N	\N	\N
+9	candidate	id	\N	input	\N	\N	\N	t	f	1	full	\N	\N	\N	f	\N	\N	\N
+10	issue	id	\N	input	\N	\N	\N	t	f	1	full	\N	\N	\N	f	\N	\N	\N
+13	issue	name	\N	input	\N	\N	\N	f	f	2	full	\N	\N	\N	t	\N	\N	\N
+19	issue	description	\N	input	\N	\N	\N	f	f	3	full	\N	\N	\N	f	\N	\N	\N
+54	stance	description	\N	input-rich-text-md	\N	\N	\N	f	f	7	full	\N	\N	\N	f	\N	\N	\N
+35	stance_fact	id	\N	\N	\N	\N	\N	f	t	1	full	\N	\N	\N	f	\N	\N	\N
+36	stance_fact	stance	\N	\N	\N	\N	\N	f	t	2	full	\N	\N	\N	f	\N	\N	\N
+37	stance_fact	fact	\N	\N	\N	\N	\N	f	t	3	full	\N	\N	\N	f	\N	\N	\N
+34	stance	facts	m2m	list-m2m	{"template":"{{fact.id}} {{fact.Summary}}"}	related-values	{"template":"{{fact.id}}{{fact.Summary}}"}	f	f	8	full	\N	\N	\N	f	\N	\N	\N
+25	stance	id	\N	input	\N	\N	\N	t	t	1	full	\N	\N	\N	f	\N	\N	\N
+26	stance	date_created	date-created	datetime	\N	datetime	{"relative":true}	t	t	2	half	\N	\N	\N	f	\N	\N	\N
+31	candidate	stances	o2m	list-o2m	{"layout":"table","tableSpacing":"compact","fields":["id","title","description"]}	\N	\N	f	f	6	full	\N	\N	\N	f	\N	\N	\N
+43	issue	points	\N	input	{"min":0,"max":null}	\N	\N	f	f	5	full	\N	\N	\N	f	\N	\N	\N
+42	stance	rating	\N	input	{"min":0,"max":100,"placeholder":"From 0 - 100"}	\N	\N	f	f	9	full	\N	\N	\N	f	\N	\N	\N
+27	stance	date_updated	date-updated	datetime	\N	datetime	{"relative":true}	t	t	3	half	\N	\N	\N	f	\N	\N	\N
+47	stance	confidence	\N	input	{"min":0,"max":100,"placeholder":"From 0 - 100"}	\N	\N	f	f	10	full	\N	\N	\N	f	\N	\N	\N
+48	stance	label	\N	computed	{"template":"{{ candidate.firstName }} {{ candidate.lastName }} - {{ issue.name }}: {{ title }}","debugMode":true,"computeIfEmpty":true,"initialCompute":true}	\N	\N	f	f	11	full	\N	\N	\N	f	\N	\N	\N
+44	stance	points	\N	computed	{"template":"{{ MULTIPLY(issue.points, DIVIDE(rating, 100)) }}","mode":null}	\N	\N	f	f	12	full	\N	\N	\N	f	\N	\N	\N
+20	fact	id	\N	input	\N	\N	\N	t	t	1	full	\N	\N	\N	f	\N	\N	\N
+30	stance	candidate	m2o	select-dropdown-m2o	{"template":"{{id}} {{firstName}} {{middleName}} {{lastName}}"}	\N	\N	f	f	4	full	\N	\N	\N	t	\N	\N	\N
+55	candidate	confidence	\N	computed	{"template":"{{ AAVG(stances, confidence) }}"}	\N	\N	f	f	8	full	\N	\N	\N	f	\N	\N	\N
+21	fact	date_created	date-created	datetime	\N	datetime	{"relative":true}	t	t	2	half	\N	\N	\N	f	\N	\N	\N
+22	fact	date_updated	date-updated	datetime	\N	datetime	{"relative":true}	t	t	3	half	\N	\N	\N	f	\N	\N	\N
+23	fact	Summary	\N	input	\N	\N	\N	f	f	4	full	\N	\N	\N	t	\N	\N	\N
+50	fact	description	\N	input-rich-text-md	{"toolbar":["heading","bold","italic","strikethrough","blockquote","bullist","numlist","table","code","image","link","underline","h1","h2","h3","removeformat","customLink","customImage","customMedia","hr","fullscreen"]}	\N	\N	f	f	5	full	\N	\N	\N	f	\N	\N	\N
+56	candidate	stancesCount	\N	computed	{"template":"{{ ACOUNT(stances, id) }}"}	\N	\N	f	f	9	full	\N	\N	\N	f	\N	\N	\N
+57	issue	confidence	\N	computed	{"template":"{{ AAVG(stances, confidence) }}"}	\N	\N	f	f	6	full	\N	\N	\N	f	\N	\N	\N
+58	issue	stancesCount	\N	computed	{"template":"{{ ACOUNT(stances, id) }}"}	\N	\N	f	f	7	full	\N	\N	\N	f	\N	\N	\N
+38	stance	issue	m2o	select-dropdown-m2o	{"template":"{{id}} {{name}}"}	\N	\N	f	f	5	full	\N	\N	\N	t	\N	\N	\N
+28	stance	title	\N	input	\N	\N	\N	f	f	6	full	\N	\N	\N	t	\N	\N	\N
+\.
+
+
+--
+-- Data for Name: directus_files; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_files (id, storage, filename_disk, filename_download, title, type, folder, uploaded_by, uploaded_on, modified_by, modified_on, charset, filesize, width, height, duration, embed, description, location, tags, metadata, focal_point_x, focal_point_y, tus_id, tus_data) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directus_flows; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_flows (id, name, icon, color, description, status, trigger, accountability, options, operation, date_created, user_created) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directus_folders; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_folders (id, name, parent) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directus_migrations; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_migrations (version, name, "timestamp") FROM stdin;
+20201028A	Remove Collection Foreign Keys	2024-08-02 20:08:47.825185+00
+20201029A	Remove System Relations	2024-08-02 20:08:47.831159+00
+20201029B	Remove System Collections	2024-08-02 20:08:47.836789+00
+20201029C	Remove System Fields	2024-08-02 20:08:47.844639+00
+20201105A	Add Cascade System Relations	2024-08-02 20:08:47.876531+00
+20201105B	Change Webhook URL Type	2024-08-02 20:08:47.882281+00
+20210225A	Add Relations Sort Field	2024-08-02 20:08:47.88814+00
+20210304A	Remove Locked Fields	2024-08-02 20:08:47.892113+00
+20210312A	Webhooks Collections Text	2024-08-02 20:08:47.898633+00
+20210331A	Add Refresh Interval	2024-08-02 20:08:47.901716+00
+20210415A	Make Filesize Nullable	2024-08-02 20:08:47.907507+00
+20210416A	Add Collections Accountability	2024-08-02 20:08:47.911542+00
+20210422A	Remove Files Interface	2024-08-02 20:08:47.913848+00
+20210506A	Rename Interfaces	2024-08-02 20:08:47.92991+00
+20210510A	Restructure Relations	2024-08-02 20:08:47.946329+00
+20210518A	Add Foreign Key Constraints	2024-08-02 20:08:47.954666+00
+20210519A	Add System Fk Triggers	2024-08-02 20:08:47.974314+00
+20210521A	Add Collections Icon Color	2024-08-02 20:08:47.976682+00
+20210525A	Add Insights	2024-08-02 20:08:47.988419+00
+20210608A	Add Deep Clone Config	2024-08-02 20:08:47.991071+00
+20210626A	Change Filesize Bigint	2024-08-02 20:08:48.000374+00
+20210716A	Add Conditions to Fields	2024-08-02 20:08:48.00282+00
+20210721A	Add Default Folder	2024-08-02 20:08:48.008228+00
+20210802A	Replace Groups	2024-08-02 20:08:48.012369+00
+20210803A	Add Required to Fields	2024-08-02 20:08:48.0154+00
+20210805A	Update Groups	2024-08-02 20:08:48.018723+00
+20210805B	Change Image Metadata Structure	2024-08-02 20:08:48.02217+00
+20210811A	Add Geometry Config	2024-08-02 20:08:48.025511+00
+20210831A	Remove Limit Column	2024-08-02 20:08:48.02805+00
+20210903A	Add Auth Provider	2024-08-02 20:08:48.041733+00
+20210907A	Webhooks Collections Not Null	2024-08-02 20:08:48.047919+00
+20210910A	Move Module Setup	2024-08-02 20:08:48.051927+00
+20210920A	Webhooks URL Not Null	2024-08-02 20:08:48.056995+00
+20210924A	Add Collection Organization	2024-08-02 20:08:48.060312+00
+20210927A	Replace Fields Group	2024-08-02 20:08:48.065429+00
+20210927B	Replace M2M Interface	2024-08-02 20:08:48.067479+00
+20210929A	Rename Login Action	2024-08-02 20:08:48.069258+00
+20211007A	Update Presets	2024-08-02 20:08:48.074859+00
+20211009A	Add Auth Data	2024-08-02 20:08:48.077532+00
+20211016A	Add Webhook Headers	2024-08-02 20:08:48.079852+00
+20211103A	Set Unique to User Token	2024-08-02 20:08:48.083556+00
+20211103B	Update Special Geometry	2024-08-02 20:08:48.085991+00
+20211104A	Remove Collections Listing	2024-08-02 20:08:48.088607+00
+20211118A	Add Notifications	2024-08-02 20:08:48.097677+00
+20211211A	Add Shares	2024-08-02 20:08:48.108558+00
+20211230A	Add Project Descriptor	2024-08-02 20:08:48.11161+00
+20220303A	Remove Default Project Color	2024-08-02 20:08:48.116678+00
+20220308A	Add Bookmark Icon and Color	2024-08-02 20:08:48.12028+00
+20220314A	Add Translation Strings	2024-08-02 20:08:48.12347+00
+20220322A	Rename Field Typecast Flags	2024-08-02 20:08:48.1288+00
+20220323A	Add Field Validation	2024-08-02 20:08:48.132177+00
+20220325A	Fix Typecast Flags	2024-08-02 20:08:48.136226+00
+20220325B	Add Default Language	2024-08-02 20:08:48.143346+00
+20220402A	Remove Default Value Panel Icon	2024-08-02 20:08:48.148439+00
+20220429A	Add Flows	2024-08-02 20:08:48.171959+00
+20220429B	Add Color to Insights Icon	2024-08-02 20:08:48.174344+00
+20220429C	Drop Non Null From IP of Activity	2024-08-02 20:08:48.176421+00
+20220429D	Drop Non Null From Sender of Notifications	2024-08-02 20:08:48.178262+00
+20220614A	Rename Hook Trigger to Event	2024-08-02 20:08:48.179977+00
+20220801A	Update Notifications Timestamp Column	2024-08-02 20:08:48.185528+00
+20220802A	Add Custom Aspect Ratios	2024-08-02 20:08:48.187992+00
+20220826A	Add Origin to Accountability	2024-08-02 20:08:48.191113+00
+20230401A	Update Material Icons	2024-08-02 20:08:48.19763+00
+20230525A	Add Preview Settings	2024-08-02 20:08:48.200265+00
+20230526A	Migrate Translation Strings	2024-08-02 20:08:48.20844+00
+20230721A	Require Shares Fields	2024-08-02 20:08:48.2127+00
+20230823A	Add Content Versioning	2024-08-02 20:08:48.224086+00
+20230927A	Themes	2024-08-02 20:08:48.236258+00
+20231009A	Update CSV Fields to Text	2024-08-02 20:08:48.241345+00
+20231009B	Update Panel Options	2024-08-02 20:08:48.246947+00
+20231010A	Add Extensions	2024-08-02 20:08:48.256217+00
+20231215A	Add Focalpoints	2024-08-02 20:08:48.261603+00
+20240122A	Add Report URL Fields	2024-08-02 20:08:48.265631+00
+20240204A	Marketplace	2024-08-02 20:08:48.287641+00
+20240305A	Change Useragent Type	2024-08-02 20:08:48.295295+00
+20240311A	Deprecate Webhooks	2024-08-02 20:08:48.301973+00
+20240422A	Public Registration	2024-08-02 20:08:48.308329+00
+20240515A	Add Session Window	2024-08-02 20:08:48.311294+00
+20240701A	Add Tus Data	2024-08-02 20:08:48.314485+00
+\.
+
+
+--
+-- Data for Name: directus_notifications; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_notifications (id, "timestamp", status, recipient, sender, subject, message, collection, item) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directus_operations; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_operations (id, name, key, type, position_x, position_y, options, resolve, reject, flow, date_created, user_created) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directus_panels; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_panels (id, dashboard, name, icon, color, show_header, note, type, position_x, position_y, width, height, options, date_created, user_created) FROM stdin;
+2ed2444f-ca71-4b2f-86f0-5639437661c6	ff2322a9-e257-4d27-80b6-e1d841f4f3fd	Issue Confidences	question_mark	#6644FF	t	\N	ordered-bar-chart	39	1	19	16	{"collection":"issue","xAxis":"name","yAxis":"confidence","showAxisLabels":"yOnly","horizontal":true,"color":"#3399FF","sortField":"points","sortOrder":"-"}	2024-08-05 21:04:03.776+00	4dfb59ee-9995-4690-9710-beb7d3acc189
+836c9762-3d1d-4733-bb08-f5b0557c47fe	ff2322a9-e257-4d27-80b6-e1d841f4f3fd	Issue Stances	waves	#2ECDA7	t	\N	ordered-bar-chart	39	18	19	14	{"collection":"issue","xAxis":"name","yAxis":"stancesCount","showAxisLabels":"yOnly","color":"#2ECDA7","horizontal":true,"sortField":"points","sortOrder":"-"}	2024-08-05 21:04:03.797+00	4dfb59ee-9995-4690-9710-beb7d3acc189
+06d2d47d-906f-4a50-8234-2afcc58078d6	e7fc9a1f-0c5c-40cb-8a0d-7ab9e55faa9d	Scores	\N	#E35169	t	\N	bar-chart	1	1	36	32	{"collection":"candidate","xAxis":"lastName","yAxis":"score","function":"sum","color":"#E35169","showAxisLabels":"xOnly"}	2024-08-03 02:18:38.254+00	4dfb59ee-9995-4690-9710-beb7d3acc189
+192a9a66-bb15-4b5a-91bc-e2efb8d48146	e7fc9a1f-0c5c-40cb-8a0d-7ab9e55faa9d	Stances	waves	#2ECDA7	t	\N	bar-chart	38	12	19	10	{"collection":"candidate","xAxis":"lastName","yAxis":"stancesCount","showAxisLabels":"xOnly","color":"#2ECDA7"}	2024-08-04 14:08:23.558+00	4dfb59ee-9995-4690-9710-beb7d3acc189
+54e8ff09-1798-4dcc-b210-03ee703cef87	e7fc9a1f-0c5c-40cb-8a0d-7ab9e55faa9d	Confidences	question_mark	#6644FF	t	\N	bar-chart	38	1	19	10	{"collection":"candidate","xAxis":"lastName","yAxis":"confidence","showAxisLabels":"xOnly"}	2024-08-04 14:08:23.549+00	4dfb59ee-9995-4690-9710-beb7d3acc189
+bd97bf14-f86a-4058-b7bf-5e4a8bd62986	e7fc9a1f-0c5c-40cb-8a0d-7ab9e55faa9d	Confidence Score Product	pivot_table_chart	#FFA439	t	\N	bar-chart	38	23	19	10	{"collection":"candidate","xAxis":"lastName","yAxis":"confidenceScoreProduct","color":"#FFA439","showAxisLabels":"xOnly","showDataLabel":false}	2024-08-05 23:01:09.665+00	4dfb59ee-9995-4690-9710-beb7d3acc189
+43becb8c-d286-4d2c-ab6e-eac98de8b9c1	ff2322a9-e257-4d27-80b6-e1d841f4f3fd	Confidences	\N	\N	f	\N	list	1	26	37	6	{"collection":"stance","horizontal":true,"yAxis":"confidence","xAxis":"label","showAxisLabels":"yOnly","filter":{"_and":[{"confidence":{"_null":true}}]},"decimals":1,"sortField":"confidence","sortOrder":"-","displayTemplate":"{{label}}","limit":null}	2024-08-06 18:03:33.578+00	4dfb59ee-9995-4690-9710-beb7d3acc189
+f3229cd6-5b4c-4635-ab65-a0e203dd066d	ff2322a9-e257-4d27-80b6-e1d841f4f3fd	Confidences	\N	\N	t	\N	ordered-bar-chart	1	1	37	25	{"collection":"stance","horizontal":true,"yAxis":"confidence","xAxis":"label","showAxisLabels":"yOnly","filter":{"_and":[{"confidence":{"_nnull":true}}]},"decimals":1,"sortField":"confidence","sortOrder":"-"}	2024-08-04 02:06:26.659+00	4dfb59ee-9995-4690-9710-beb7d3acc189
+e96f2fca-24bb-49c5-91d0-8a94336e6d1e	9ccac6c8-bb2a-477c-a2b9-233ecb9f0925	Candidate Contest	\N	\N	t	\N	candidate-contest	1	1	57	31	{"text":null}	2024-08-04 00:48:02.988+00	4dfb59ee-9995-4690-9710-beb7d3acc189
+\.
+
+
+--
+-- Data for Name: directus_permissions; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_permissions (id, role, collection, action, permissions, validation, presets, fields) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directus_presets; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_presets (id, bookmark, "user", role, collection, search, layout, layout_query, layout_options, refresh_interval, filter, icon, color) FROM stdin;
+11	Spreadsheet	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	stance	\N	editable-layout	{"tabular":{"page":1,"fields":["candidate.firstName","candidate.lastName","issue.name","title","description","facts"]},"directus-labs-spreadsheet-layout":{"fields":["title","description","rating","confidence"],"page":1},"editable-layout":{"fields":["label","title","description","rating","confidence","points"],"sort":["confidence"],"page":1}}	{"tabular":{"widths":{}},"kanban":{"groupTitle":"lastName","groupField":"candidate","textField":"description","dateField":null,"showUngrouped":false},"directus-labs-spreadsheet-layout":{"widths":{"description":248,"rating":101.60003662109375},"spacing":"compact"},"editable-layout":{"widths":{"label":191,"title":272,"description":288}}}	\N	\N	bookmark	\N
+1	\N	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	first	\N	tabular	{"map":{"limit":1000},"tabular":{"page":1}}	{"map":{"cameraOptions":{"center":{"lng":0,"lat":2.842170943040401e-14},"zoom":0.4512110913743379,"bearing":0,"pitch":0,"bbox":[-245.05714633215408,-85.05112900000017,245.057146332152,85.05112900000012]}}}	\N	\N	bookmark	\N
+2	\N	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	candidate	\N	tabular	{"tabular":{"page":1,"fields":["id","firstName","middleName","lastName"],"sort":["lastName"]},"dcb-tree-view":{"page":1}}	{"cards":{"title":"{{id}} {{firstName}} {{lastName}}"},"tabular":{"widths":{}},"dcb-tree-view":{"labelPrimary":"{{firstName}} {{middleName}} ","collapsed":[],"labelSecondary":"{{id}}","metaCollectionName":"issues","slugifyFieldName":"lastName"}}	\N	\N	bookmark	\N
+7	\N	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	candidate	\N	\N	{"tabular":{"page":1}}	\N	\N	\N	bookmark	\N
+10	Visualization	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	stance	\N	kanban	{"tabular":{"page":1,"fields":["candidate.firstName","candidate.lastName","issue.name","title","description","facts"]}}	{"tabular":{"widths":{}},"kanban":{"groupTitle":"lastName","groupField":"candidate","textField":"description","dateField":null,"showUngrouped":false,"titleField":"label"},"cdh-kanboard":{"groupField":"candidate","groupTitle":"lastName","titleField":"title","textField":"description","dateField":null,"showIndex":false}}	\N	\N	bookmark	\N
+6	Spreadsheet	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	issue	\N	directus-labs-spreadsheet-layout	{"directus-labs-spreadsheet-layout":{"fields":["name","description","points"],"sort":["-points"],"page":1}}	{"directus-labs-spreadsheet-layout":{"widths":{"name":359.1999816894531,"description":410.3999938964844}}}	\N	\N	bookmark	\N
+4	Cards	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	candidate	\N	cards	{"tabular":{"page":1}}	{"cards":{"title":"{{id}} {{firstName}} {{lastName}}"}}	\N	\N	bookmark	\N
+13	Spreadsheet	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	fact	\N	editable-layout	{"tabular":{"fields":["Description","Summary","sources"]},"directus-labs-spreadsheet-layout":{"fields":["Summary","tempdescription"]},"editable-layout":{"fields":["Summary","description"],"page":1}}	{"tabular":{"widths":{"Description":412.8000183105469}},"directus-labs-spreadsheet-layout":{"widths":{"Summary":428.60003662109375,"Description":606.3999633789062},"spacing":"compact"},"editable-layout":{"widths":{"Summary":501.5999755859375,"description":529.4000244140625}}}	\N	\N	bookmark	\N
+8	\N	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	stance	\N	directus-labs-spreadsheet-layout	{"tabular":{"page":1,"fields":["candidate.firstName","candidate.lastName","issue.name","title","description","facts"]},"directus-labs-spreadsheet-layout":{"fields":["description","title","rating","confidence"],"sort":["confidence"],"page":1}}	{"tabular":{"widths":{}},"kanban":{"groupTitle":"lastName","groupField":"candidate","textField":"description","dateField":null,"showUngrouped":false},"directus-labs-spreadsheet-layout":{"widths":{"candidate":130.39999389648438,"issue":93.5999755859375,"description":248,"rating":101.60003662109375},"spacing":"compact"}}	\N	\N	bookmark	\N
+9	List	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	stance	\N	tabular	{"tabular":{"page":1,"fields":["candidate.lastName","issue.name","title","description","facts","rating","confidence","points"],"sort":["issue.name"]},"directus-labs-spreadsheet-layout":{"fields":["candidate","description","issue","title","rating"]}}	{"tabular":{"widths":{"candidate.lastName":111.19998168945312,"issue.name":124.79998779296875,"title":253.5999755859375,"description":233.5999755859375,"facts":92,"rating":91.199951171875}}}	\N	\N	bookmark	\N
+3	\N	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	issue	\N	tabular	{"tabular":{"page":1,"fields":["id","name","description","points"],"sort":["-points"]}}	{"tabular":{"widths":{"id":64.79998779296875,"name":365.5999755859375,"description":463.2000732421875}}}	\N	\N	bookmark	\N
+12	\N	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	fact	\N	tabular	{"tabular":{"fields":["Summary","description","sources","tempsources"]},"directus-labs-spreadsheet-layout":{"fields":["Summary","tempdescription","Description"]}}	{"tabular":{"widths":{}},"directus-labs-spreadsheet-layout":{"widths":{"Description":289.5999755859375}}}	\N	\N	bookmark	\N
+5	List	4dfb59ee-9995-4690-9710-beb7d3acc189	\N	candidate	\N	tabular	{"tabular":{"page":1,"fields":["id","firstName","middleName","lastName","score","confidence","stancesCount"],"sort":["lastName"]}}	{"cards":{"title":"{{id}} {{firstName}} {{lastName}}"},"tabular":{"widths":{"score":104,"confidence":138.4000244140625}}}	\N	\N	bookmark	\N
+\.
+
+
+--
+-- Data for Name: directus_relations; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_relations (id, many_collection, many_field, one_collection, one_field, one_collection_field, one_allowed_collections, junction_field, sort_field, one_deselect_action) FROM stdin;
+1	first	user_created	directus_users	\N	\N	\N	\N	\N	nullify
+2	first	user_updated	directus_users	\N	\N	\N	\N	\N	nullify
+3	stance	candidate	candidate	stances	\N	\N	\N	\N	nullify
+5	stance_fact	fact	fact	\N	\N	\N	stance	\N	nullify
+6	stance_fact	stance	stance	facts	\N	\N	fact	\N	nullify
+7	stance	issue	issue	stances	\N	\N	\N	\N	nullify
+\.
+
+
+--
+-- Data for Name: directus_revisions; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_revisions (id, activity, collection, item, data, delta, parent, version) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directus_roles; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_roles (id, name, icon, description, ip_access, enforce_tfa, admin_access, app_access) FROM stdin;
+d985b9df-6fad-4233-ba88-6abaa7f6b021	Administrator	verified	$t:admin_description	\N	f	t	t
+\.
+
+
+--
+-- Data for Name: directus_sessions; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_sessions (token, "user", expires, ip, user_agent, share, origin, next_token) FROM stdin;
+HNRpPTOJn7FvwW3BgsNX2WQj3pG3o38jt3o_ztlh_mawGuzqJN233iBblr6MO-gv	4dfb59ee-9995-4690-9710-beb7d3acc189	2024-08-16 17:00:21.988+00	172.24.0.1	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 Edg/127.0.0.0	\N	http://localhost:8055	\N
+\.
+
+
+--
+-- Data for Name: directus_settings; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_settings (id, project_name, project_url, project_color, project_logo, public_foreground, public_background, public_note, auth_login_attempts, auth_password_policy, storage_asset_transform, storage_asset_presets, custom_css, storage_default_folder, basemaps, mapbox_key, module_bar, project_descriptor, default_language, custom_aspect_ratios, public_favicon, default_appearance, default_theme_light, theme_light_overrides, default_theme_dark, theme_dark_overrides, report_error_url, report_bug_url, report_feature_url, public_registration, public_registration_verify_email, public_registration_role, public_registration_email_filter) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directus_shares; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_shares (id, name, collection, item, role, password, user_created, date_created, date_start, date_end, times_used, max_uses) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directus_translations; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_translations (id, language, key, value) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directus_users; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_users (id, first_name, last_name, email, password, location, title, description, tags, avatar, language, tfa_secret, status, role, token, last_access, last_page, provider, external_identifier, auth_data, email_notifications, appearance, theme_dark, theme_light, theme_light_overrides, theme_dark_overrides) FROM stdin;
+4dfb59ee-9995-4690-9710-beb7d3acc189	Admin	User	admin@example.com	$argon2id$v=19$m=65536,t=3,p=4$YSph319gpfWwseLgrbiaoQ$7UWRPuplTOE0E1gQXS8riWVVKSmSDeFCVPAHw3gJsOw	\N	\N	\N	\N	\N	\N	\N	active	d985b9df-6fad-4233-ba88-6abaa7f6b021	\N	2024-08-09 17:00:22.013+00	/insights	default	\N	\N	t	\N	\N	\N	\N	\N
+\.
+
+
+--
+-- Data for Name: directus_versions; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_versions (id, key, name, collection, item, hash, date_created, date_updated, user_created, user_updated) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directus_webhooks; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.directus_webhooks (id, name, method, url, status, data, actions, collections, headers, was_active_before_deprecation, migrated_flow) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fact; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.fact (id, date_created, date_updated, "Summary", description) FROM stdin;
+\.
+
+
+--
+-- Data for Name: issue; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.issue (id, name, description, points, confidence, "stancesCount") FROM stdin;
+\.
+
+
+--
+-- Data for Name: stance; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.stance (id, date_created, date_updated, title, candidate, issue, rating, points, confidence, label, description) FROM stdin;
+\.
+
+
+--
+-- Data for Name: stance_fact; Type: TABLE DATA; Schema: public; Owner: db-ui-user
+--
+
+COPY public.stance_fact (id, stance, fact) FROM stdin;
+\.
+
+
+--
+-- Name: candidates_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.candidates_id_seq', 9, true);
+
+
+--
+-- Name: directus_activity_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.directus_activity_id_seq', 723, true);
+
+
+--
+-- Name: directus_fields_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.directus_fields_id_seq', 59, true);
+
+
+--
+-- Name: directus_notifications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.directus_notifications_id_seq', 1, false);
+
+
+--
+-- Name: directus_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.directus_permissions_id_seq', 1, false);
+
+
+--
+-- Name: directus_presets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.directus_presets_id_seq', 13, true);
+
+
+--
+-- Name: directus_relations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.directus_relations_id_seq', 7, true);
+
+
+--
+-- Name: directus_revisions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.directus_revisions_id_seq', 699, true);
+
+
+--
+-- Name: directus_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.directus_settings_id_seq', 1, false);
+
+
+--
+-- Name: directus_webhooks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.directus_webhooks_id_seq', 1, false);
+
+
+--
+-- Name: fact_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.fact_id_seq', 46, true);
+
+
+--
+-- Name: issues_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.issues_id_seq', 10, true);
+
+
+--
+-- Name: stance_fact_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.stance_fact_id_seq', 46, true);
+
+
+--
+-- Name: stance_id_seq; Type: SEQUENCE SET; Schema: public; Owner: db-ui-user
+--
+
+SELECT pg_catalog.setval('public.stance_id_seq', 17, true);
+
+
+--
+-- Name: candidate candidates_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.candidate
+    ADD CONSTRAINT candidates_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_activity directus_activity_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_activity
+    ADD CONSTRAINT directus_activity_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_collections directus_collections_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_collections
+    ADD CONSTRAINT directus_collections_pkey PRIMARY KEY (collection);
+
+
+--
+-- Name: directus_dashboards directus_dashboards_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_dashboards
+    ADD CONSTRAINT directus_dashboards_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_extensions directus_extensions_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_extensions
+    ADD CONSTRAINT directus_extensions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_fields directus_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_fields
+    ADD CONSTRAINT directus_fields_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_files directus_files_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_files
+    ADD CONSTRAINT directus_files_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_flows directus_flows_operation_unique; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_flows
+    ADD CONSTRAINT directus_flows_operation_unique UNIQUE (operation);
+
+
+--
+-- Name: directus_flows directus_flows_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_flows
+    ADD CONSTRAINT directus_flows_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_folders directus_folders_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_folders
+    ADD CONSTRAINT directus_folders_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_migrations directus_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_migrations
+    ADD CONSTRAINT directus_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: directus_notifications directus_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_notifications
+    ADD CONSTRAINT directus_notifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_operations directus_operations_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_operations
+    ADD CONSTRAINT directus_operations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_operations directus_operations_reject_unique; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_operations
+    ADD CONSTRAINT directus_operations_reject_unique UNIQUE (reject);
+
+
+--
+-- Name: directus_operations directus_operations_resolve_unique; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_operations
+    ADD CONSTRAINT directus_operations_resolve_unique UNIQUE (resolve);
+
+
+--
+-- Name: directus_panels directus_panels_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_panels
+    ADD CONSTRAINT directus_panels_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_permissions directus_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_permissions
+    ADD CONSTRAINT directus_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_presets directus_presets_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_presets
+    ADD CONSTRAINT directus_presets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_relations directus_relations_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_relations
+    ADD CONSTRAINT directus_relations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_revisions directus_revisions_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_revisions
+    ADD CONSTRAINT directus_revisions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_roles directus_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_roles
+    ADD CONSTRAINT directus_roles_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_sessions directus_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_sessions
+    ADD CONSTRAINT directus_sessions_pkey PRIMARY KEY (token);
+
+
+--
+-- Name: directus_settings directus_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_settings
+    ADD CONSTRAINT directus_settings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_shares directus_shares_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_shares
+    ADD CONSTRAINT directus_shares_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_translations directus_translations_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_translations
+    ADD CONSTRAINT directus_translations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_users directus_users_email_unique; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_users
+    ADD CONSTRAINT directus_users_email_unique UNIQUE (email);
+
+
+--
+-- Name: directus_users directus_users_external_identifier_unique; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_users
+    ADD CONSTRAINT directus_users_external_identifier_unique UNIQUE (external_identifier);
+
+
+--
+-- Name: directus_users directus_users_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_users
+    ADD CONSTRAINT directus_users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_users directus_users_token_unique; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_users
+    ADD CONSTRAINT directus_users_token_unique UNIQUE (token);
+
+
+--
+-- Name: directus_versions directus_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_versions
+    ADD CONSTRAINT directus_versions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_webhooks directus_webhooks_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_webhooks
+    ADD CONSTRAINT directus_webhooks_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fact fact_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.fact
+    ADD CONSTRAINT fact_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: issue issues_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.issue
+    ADD CONSTRAINT issues_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stance_fact stance_fact_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.stance_fact
+    ADD CONSTRAINT stance_fact_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stance stance_pkey; Type: CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.stance
+    ADD CONSTRAINT stance_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directus_collections directus_collections_group_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_collections
+    ADD CONSTRAINT directus_collections_group_foreign FOREIGN KEY ("group") REFERENCES public.directus_collections(collection);
+
+
+--
+-- Name: directus_dashboards directus_dashboards_user_created_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_dashboards
+    ADD CONSTRAINT directus_dashboards_user_created_foreign FOREIGN KEY (user_created) REFERENCES public.directus_users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: directus_files directus_files_folder_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_files
+    ADD CONSTRAINT directus_files_folder_foreign FOREIGN KEY (folder) REFERENCES public.directus_folders(id) ON DELETE SET NULL;
+
+
+--
+-- Name: directus_files directus_files_modified_by_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_files
+    ADD CONSTRAINT directus_files_modified_by_foreign FOREIGN KEY (modified_by) REFERENCES public.directus_users(id);
+
+
+--
+-- Name: directus_files directus_files_uploaded_by_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_files
+    ADD CONSTRAINT directus_files_uploaded_by_foreign FOREIGN KEY (uploaded_by) REFERENCES public.directus_users(id);
+
+
+--
+-- Name: directus_flows directus_flows_user_created_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_flows
+    ADD CONSTRAINT directus_flows_user_created_foreign FOREIGN KEY (user_created) REFERENCES public.directus_users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: directus_folders directus_folders_parent_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_folders
+    ADD CONSTRAINT directus_folders_parent_foreign FOREIGN KEY (parent) REFERENCES public.directus_folders(id);
+
+
+--
+-- Name: directus_notifications directus_notifications_recipient_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_notifications
+    ADD CONSTRAINT directus_notifications_recipient_foreign FOREIGN KEY (recipient) REFERENCES public.directus_users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_notifications directus_notifications_sender_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_notifications
+    ADD CONSTRAINT directus_notifications_sender_foreign FOREIGN KEY (sender) REFERENCES public.directus_users(id);
+
+
+--
+-- Name: directus_operations directus_operations_flow_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_operations
+    ADD CONSTRAINT directus_operations_flow_foreign FOREIGN KEY (flow) REFERENCES public.directus_flows(id) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_operations directus_operations_reject_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_operations
+    ADD CONSTRAINT directus_operations_reject_foreign FOREIGN KEY (reject) REFERENCES public.directus_operations(id);
+
+
+--
+-- Name: directus_operations directus_operations_resolve_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_operations
+    ADD CONSTRAINT directus_operations_resolve_foreign FOREIGN KEY (resolve) REFERENCES public.directus_operations(id);
+
+
+--
+-- Name: directus_operations directus_operations_user_created_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_operations
+    ADD CONSTRAINT directus_operations_user_created_foreign FOREIGN KEY (user_created) REFERENCES public.directus_users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: directus_panels directus_panels_dashboard_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_panels
+    ADD CONSTRAINT directus_panels_dashboard_foreign FOREIGN KEY (dashboard) REFERENCES public.directus_dashboards(id) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_panels directus_panels_user_created_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_panels
+    ADD CONSTRAINT directus_panels_user_created_foreign FOREIGN KEY (user_created) REFERENCES public.directus_users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: directus_permissions directus_permissions_role_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_permissions
+    ADD CONSTRAINT directus_permissions_role_foreign FOREIGN KEY (role) REFERENCES public.directus_roles(id) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_presets directus_presets_role_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_presets
+    ADD CONSTRAINT directus_presets_role_foreign FOREIGN KEY (role) REFERENCES public.directus_roles(id) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_presets directus_presets_user_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_presets
+    ADD CONSTRAINT directus_presets_user_foreign FOREIGN KEY ("user") REFERENCES public.directus_users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_revisions directus_revisions_activity_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_revisions
+    ADD CONSTRAINT directus_revisions_activity_foreign FOREIGN KEY (activity) REFERENCES public.directus_activity(id) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_revisions directus_revisions_parent_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_revisions
+    ADD CONSTRAINT directus_revisions_parent_foreign FOREIGN KEY (parent) REFERENCES public.directus_revisions(id);
+
+
+--
+-- Name: directus_revisions directus_revisions_version_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_revisions
+    ADD CONSTRAINT directus_revisions_version_foreign FOREIGN KEY (version) REFERENCES public.directus_versions(id) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_sessions directus_sessions_share_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_sessions
+    ADD CONSTRAINT directus_sessions_share_foreign FOREIGN KEY (share) REFERENCES public.directus_shares(id) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_sessions directus_sessions_user_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_sessions
+    ADD CONSTRAINT directus_sessions_user_foreign FOREIGN KEY ("user") REFERENCES public.directus_users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_settings directus_settings_project_logo_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_settings
+    ADD CONSTRAINT directus_settings_project_logo_foreign FOREIGN KEY (project_logo) REFERENCES public.directus_files(id);
+
+
+--
+-- Name: directus_settings directus_settings_public_background_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_settings
+    ADD CONSTRAINT directus_settings_public_background_foreign FOREIGN KEY (public_background) REFERENCES public.directus_files(id);
+
+
+--
+-- Name: directus_settings directus_settings_public_favicon_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_settings
+    ADD CONSTRAINT directus_settings_public_favicon_foreign FOREIGN KEY (public_favicon) REFERENCES public.directus_files(id);
+
+
+--
+-- Name: directus_settings directus_settings_public_foreground_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_settings
+    ADD CONSTRAINT directus_settings_public_foreground_foreign FOREIGN KEY (public_foreground) REFERENCES public.directus_files(id);
+
+
+--
+-- Name: directus_settings directus_settings_public_registration_role_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_settings
+    ADD CONSTRAINT directus_settings_public_registration_role_foreign FOREIGN KEY (public_registration_role) REFERENCES public.directus_roles(id) ON DELETE SET NULL;
+
+
+--
+-- Name: directus_settings directus_settings_storage_default_folder_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_settings
+    ADD CONSTRAINT directus_settings_storage_default_folder_foreign FOREIGN KEY (storage_default_folder) REFERENCES public.directus_folders(id) ON DELETE SET NULL;
+
+
+--
+-- Name: directus_shares directus_shares_collection_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_shares
+    ADD CONSTRAINT directus_shares_collection_foreign FOREIGN KEY (collection) REFERENCES public.directus_collections(collection) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_shares directus_shares_role_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_shares
+    ADD CONSTRAINT directus_shares_role_foreign FOREIGN KEY (role) REFERENCES public.directus_roles(id) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_shares directus_shares_user_created_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_shares
+    ADD CONSTRAINT directus_shares_user_created_foreign FOREIGN KEY (user_created) REFERENCES public.directus_users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: directus_users directus_users_role_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_users
+    ADD CONSTRAINT directus_users_role_foreign FOREIGN KEY (role) REFERENCES public.directus_roles(id) ON DELETE SET NULL;
+
+
+--
+-- Name: directus_versions directus_versions_collection_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_versions
+    ADD CONSTRAINT directus_versions_collection_foreign FOREIGN KEY (collection) REFERENCES public.directus_collections(collection) ON DELETE CASCADE;
+
+
+--
+-- Name: directus_versions directus_versions_user_created_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_versions
+    ADD CONSTRAINT directus_versions_user_created_foreign FOREIGN KEY (user_created) REFERENCES public.directus_users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: directus_versions directus_versions_user_updated_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_versions
+    ADD CONSTRAINT directus_versions_user_updated_foreign FOREIGN KEY (user_updated) REFERENCES public.directus_users(id);
+
+
+--
+-- Name: directus_webhooks directus_webhooks_migrated_flow_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.directus_webhooks
+    ADD CONSTRAINT directus_webhooks_migrated_flow_foreign FOREIGN KEY (migrated_flow) REFERENCES public.directus_flows(id) ON DELETE SET NULL;
+
+
+--
+-- Name: stance stance_candidate_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.stance
+    ADD CONSTRAINT stance_candidate_foreign FOREIGN KEY (candidate) REFERENCES public.candidate(id) ON DELETE SET NULL;
+
+
+--
+-- Name: stance_fact stance_fact_fact_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.stance_fact
+    ADD CONSTRAINT stance_fact_fact_foreign FOREIGN KEY (fact) REFERENCES public.fact(id) ON DELETE SET NULL;
+
+
+--
+-- Name: stance_fact stance_fact_stance_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.stance_fact
+    ADD CONSTRAINT stance_fact_stance_foreign FOREIGN KEY (stance) REFERENCES public.stance(id) ON DELETE SET NULL;
+
+
+--
+-- Name: stance stance_issue_foreign; Type: FK CONSTRAINT; Schema: public; Owner: db-ui-user
+--
+
+ALTER TABLE ONLY public.stance
+    ADD CONSTRAINT stance_issue_foreign FOREIGN KEY (issue) REFERENCES public.issue(id) ON DELETE SET NULL;
+
+
+--
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: db-ui-user
+--
+
+REVOKE USAGE ON SCHEMA public FROM PUBLIC;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

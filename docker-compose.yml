@@ -1,0 +1,103 @@
+services:
+  postgresql:
+    image: postgres:12.19
+    environment:
+      POSTGRES_USER: db-ui-user
+      POSTGRES_PASSWORD: db-ui-password
+      POSTGRES_DB: db-ui
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+
+  appsmith:
+    image: appsmith/appsmith-ce:v1.34
+    ports:
+      - '4880:80'
+      - '4843:443'
+    volumes:
+      - appsmith_stacks:/appsmith-stacks
+    depends_on:
+      - postgresql
+    profiles:
+      - appsmith
+
+  directus:
+    image: directus/directus:10.13.1
+    ports:
+      - '8055:8055'
+    environment:
+      SECRET: replace-with-secure-random-value
+      DB_CLIENT: pg
+      DB_CONNECTION_STRING: postgresql://db-ui-user:db-ui-password@postgresql:5432/db-ui
+      ADMIN_EMAIL: 'admin@example.com'
+      ADMIN_PASSWORD: '4dm1n'
+      EXTENSIONS_AUTO_RELOAD: true
+    volumes:
+      - directus_database:/directus/database
+      - directus_uploads:/directus/uploads
+      - directus_extensions:/directus/extensions
+      - directus_templates:/directus/templates
+    depends_on:
+      - postgresql
+    profiles:
+      - directus
+      - ''
+
+  webdb:
+    image: webdb/app:2024.07.14
+    ports:
+      - '22071:22071'
+    volumes:
+      - webdb:/usr/src/app/static/version
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    depends_on:
+      - postgresql
+    profiles:
+      - webdb
+      - ''
+
+volumes:
+  postgresql:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./packages/data/postgresql
+  appsmith_stacks:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./packages/data/appsmith/stacks
+  directus_database:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./packages/data/directus/database
+  directus_extensions:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./packages/data/directus/extensions
+  directus_templates:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./packages/data/directus/templates
+  directus_uploads:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./packages/data/directus/uploads
+  webdb:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./packages/data/webdb

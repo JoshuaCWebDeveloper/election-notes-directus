@@ -1,0 +1,17 @@
+{
+  "name": "directus-extension-ordered-bar-chart",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/directus-extension-ordered-bar-chart/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "command": "bash packages/directus-extension-ordered-bar-chart/build.sh",
+      "configurations": {
+        "production": {
+          "command": "bash packages/directus-extension-ordered-bar-chart/build.sh production"
+        }
+      }
+    }
+  }
+}
