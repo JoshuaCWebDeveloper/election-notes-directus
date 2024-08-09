@@ -32,7 +32,7 @@ docker compose down
 
 ### Getting Started
 
-Access the Directus instances at `http://localhost:8055`.
+Access the Directus instance at `http://localhost:8055`.
 
 Login with username `admin@example.com` and password `4dm1n`.
 
